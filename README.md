@@ -1,36 +1,39 @@
 # rmua19_gazebo_simulator
 
-### 1. 简介
+### 1. Introduction
 
-rmua19_gazebo_simulator是基于Gazebo (Ignition 字母版本)的仿真环境，为RoboMaster University AI Challenge 2019中的机器人算法开发提供仿真环境，方便测试AI算法，加快开发效率。
+rmua19_gazebo_simulator is a simulation environment based on Gazebo (Ignition alphabetical version) for the development of robotics algorithms in RoboMaster University AI Challenge 2019, to facilitate testing of AI algorithms and speed up development efficiency.
 
 ![](doc/imgs/start.png)
 
-目前rmua19_gazebo_simulator还不完善，仅提供以下功能：
+The rmua19_gazebo_simulator is not yet complete and only offers the following features.
 
-在rmua19标准机器人（rmua19_standard_robot）上增加相关传感器，构建不同机器人模型:
-  * rmua19_standard_robot_a：搭载云台相机industrial_camera和搭载激光雷达rplidar_a2，其中相机放置有在yaw轴。
-  * rmua19_standard_robot_b：搭载云台相机industrial_camera和搭载激光雷达rplidar_a2，其中相机放置有在pitch轴。
+Adding relevant sensors to the rmua19 standard robot (rmua19_standard_robot) and building different robot models:
+  * rmua19_standard_robot_a: with gimbal camera industrial_camera and with LIDAR rplidar_a2, where the camera is placed on the yaw axis.
+  * rmua19_standard_robot_b: with gimbal camera industrial_camera and LIDAR rplidar_a2, where the camera is placed on the pitch axis.
 
-构建RoboMaster University AI Challenge 2019简易场地(models/rmua19_battlefield):
-  * 只有围墙
+Building the RoboMaster University AI Challenge 2019 simple field (models/rmua19_battlefield):
+  * Only the fence
 
-> RoboMaster University AI Challenge 2019标准机器人机器人模型(rmua19_standard_robot)位于[rmoss_gz_resources](https://github.com/robomaster-oss/rmoss_gz_resources)
+> RoboMaster University AI Challenge 2019 standard robot robot model (rmua19_standard_robot) located at [rmoss_gz_resources](https://github.com/robomaster-oss/rmoss_gz_resources)
 >
-> 注意：[Gazebo (Ignition 字母版本)](https://github.com/gazebosim/gz-sim)目前依然处于快速开发期，仿真功能不完善，且可能存在Bug。
+> Note: [Gazebo (Ignition alphabetical version)](https://github.com/gazebosim/gz-sim) is still in rapid development and the emulation is not perfect and may be buggy.
 
-### 2. 基本使用
+### 2. Basic use
 
-**环境配置**
+**Environment configuration**
 
-* ROS2版本要求: `Humble` (目前处于开发期，基于ROS2最新版本)
-* Gazebo仿真器版本要求: ` Fortress` (目前新版本Gazebo处于开发期)
+* ROS2 version requirement: `Humble` (currently in development, based on the latest version of ROS2)
+* Gazebo emulator version requirements: `` Fortress`` (new version of Gazebo is currently in development)
 
 ```bash
 # install gazebo dependencies
 sudo apt-get install ignition-fortress libignition-cmake2-dev ros-humble-ros-gz
 # install xmacro (xml macro tool for sdf)
 pip install xmacro
+# added by @marcopra
+pip install empy
+pip install lark
 # cd src directory of ros2 workspace 
 git clone https://github.com/robomaster-oss/rmoss_interfaces -b humble
 git clone https://github.com/robomaster-oss/rmoss_core -b humble
@@ -42,50 +45,53 @@ cd ..
 rosdep install -y -r -q --from-paths src --ignore-src --rosdistro humble
 # cd ros2 workspace
 colcon build
+
+# Source this workspace setup.bash path
+source ~/<this_workspace_path>/install/setup.bash
 ```
 
-**启动仿真环境**
+**starting the simulation environment**
 
 ```bash
 # ros2 launch rmua19_gazebo_simulator standard_robot_a_test.launch.py 
 ros2 launch rmua19_gazebo_simulator standard_robot_b_test.launch.py 
 ```
 
-* 注意：需要点击Gazebo界面上的橙红色的`启动`按钮
+* Note: You need to click the orange ``launch`` button on the Gazebo interface
 
-**控制机器人移动**
+**Control robot movement**
 
 ```bash
 ros2 run rmoss_gz_base test_chassis_cmd.py --ros-args -r __ns:=/red_standard_robot1/robot_base -p v:=0.3 -p w:=0.3
-#根据提示进行输入，支持平移与自旋
+#Type as prompted, supports translation and spin
 ```
 
-* 底盘采用mecanum插件控制
+* The base plate is controlled using the mecanum plugin
 
-**控制机器人云台**
+**Control robot gimbal**
 
 ```bash
 ros2 run rmoss_gz_base test_gimbal_cmd.py --ros-args -r __ns:=/red_standard_robot1/robot_base
-#根据提示进行输入，支持绝对角度控制
+# Enter as prompted, absolute angle control supported
 ```
 
-* 云台采用位置PID控制
+* The head uses position PID control
 
-**机器人射击**
+**robot shooting**
 
 ```bash
 ros2 run rmoss_gz_base test_shoot_cmd.py --ros-args -r __ns:=/red_standard_robot1/robot_base
-#根据提示进行输入
+#Type as prompted
 ```
 
-* 射击功能基于`rmoss_gz`中的插件`ProjectileShooter`，
-* **注意：目前存在未解决BUG (某些情况下会使得物理引擎错误，造成Gazebo崩溃)**
+* The shooting function is based on the plugin `ProjectileShooter` in `rmoss_gz`.
+* **Note: There is currently an unresolved bug (in some cases it can make the physics engine wrong and cause Gazebo to crash)**
 
-### 3. 简易竞赛模式1v1
+### 3. Easy Race Mode 1v1
 
-* 目前测试中，射击功能存在已知BUG，以及可能存在其他未知BUG，请谨慎使用。
+* Please use caution as there are known bugs in the shooting function and possibly other unknown bugs in the current testing.
 
-**运行Gazebo仿真器**
+**Run the Gazebo emulator**
 
 ```bash
 ros2 launch rmua19_gazebo_simulator simple_competition_1v1.launch.py 
@@ -93,18 +99,18 @@ ros2 launch rmua19_gazebo_simulator simple_competition_1v1.launch.py
 
 ![](doc/imgs/simple_competition_1v1.png)
 
-**运行裁判系统**
+**Running the referee system**
 
 ```bash
 ros2 run rmua19_gazebo_simulator simple_competition_1v1_referee.py 
 ```
 
-* 弹丸伤害为10，每个机器人HP为500，直到HP为0时，裁判系统输出胜利者，程序退出。（可重新运行开始）
-* 通过解析并处理攻击信息`/referee_system/attack_info` （包括射击者信息以及击中目标信息）实现裁判功能。
+* Projectile damage is 10 and each robot has 500 HP until HP is 0. The referee system outputs the winner and the program exits. (can be re-run to start)
+* Referee function by parsing and processing attack information `/referee_system/attack_info` (including shooter information as well as hit target information).
 
-**控制机器人-ROS2接口**
+**Controlbot-ROS2 interface**
 
-例如，对于red_standard_robot1，有如下ROS2 topic接口使用，可用于机器人控制和感知。(对于standard_robot_blue1同理)
+For example, for red_standard_robot1, the following ROS2 topic interface is used for robot control and awareness. (same for standard_robot_blue1)
 
 ```bash
 /red_standard_robot1/robot_base/chassis_cmd
@@ -115,9 +121,9 @@ ros2 run rmua19_gazebo_simulator simple_competition_1v1_referee.py
 /red_standard_robot1/rplidar_a2/scan
 ```
 
-### 4. 维护者及开源许可证
+### 4. Maintainer and open source license
 
 Maintainer: Zhenpeng Ge, zhenpeng.ge@qq.com
 
-rmua19_gazebo_simulator is provided under Apache License 2.0.
+rmua19_gazebo_simulator is provided under the Apache License 2.0.
 
